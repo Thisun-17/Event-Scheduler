@@ -1,33 +1,38 @@
 const mongoose = require('mongoose');
 
 const EventSchema = new mongoose.Schema({
-  title: {
+  name: {
     type: String,
     required: true
   },
   description: {
     type: String,
-    required: true
+    default: ''
   },
   date: {
     type: Date,
-    required: true
-  },
-  time: {
-    type: String,
     required: true
   },
   location: {
     type: String,
     required: true
   },
-  organizer: {
+  category: {
     type: String,
-    required: true
+    default: 'General'
   },
-  email: {
-    type: String,
-    required: true
+  reminder: {
+    send: {
+      type: Boolean,
+      default: false
+    },
+    email: {
+      type: String
+    },
+    sent: {
+      type: Boolean,
+      default: false
+    }
   },
   createdAt: {
     type: Date,
