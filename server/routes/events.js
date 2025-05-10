@@ -44,21 +44,36 @@ router.get('/:id', async (req, res) => {
 // @access  Public
 router.post('/', async (req, res) => {
   try {
+    console.log('Received event data:', req.body);
+    
     const newEvent = new Event({
       ...req.body
     });
-    
-    const event = await newEvent.save();
+      const event = await newEvent.save();
     
     // Send email notification if needed
-    if (event.email) {
-      sendReminderEmail(event);
+    if (event.reminder && event.reminder.send && event.reminder.email) {
+      try {
+        await sendReminderEmail(event);
+        console.log('Reminder email sent successfully');
+      } catch (emailErr) {
+        console.error('Failed to send email:', emailErr);
+        // Continue with the response even if email fails
+      }
     }
     
-    res.json(event);
+    console.log('Event saved successfully:', event);
+    res.status(201).json(event);
   } catch (err) {
-    console.error(err.message);
-    res.status(500).send('Server Error');
+    console.error('Error creating event:', err.message);
+    if (err.name === 'ValidationError') {
+      const validationErrors = {};
+      for (let field in err.errors) {
+        validationErrors[field] = err.errors[field].message;
+      }
+      return res.status(400).json({ error: 'Validation Error', details: validationErrors });
+    }
+    res.status(500).json({ error: 'Server Error', message: err.message });
   }
 });
 
