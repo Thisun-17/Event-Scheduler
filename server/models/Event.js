@@ -1,34 +1,41 @@
-const express = require('express');
-const router = express.Router();
-const Event = require('../models/Event');
-const { sendReminderEmail } = require('../utils/mailer');
+const mongoose = require('mongoose');
 
-// @route   PUT api/events/:id
-// @desc    Update an event
-// @access  Public
-router.put('/:id', async (req, res) => {
-  try {
-    const event = await Event.findById(req.params.id);
-    
-    if (!event) {
-      return res.status(404).json({ msg: 'Event not found' });
-    }
-    
-    // Update the event
-    const updatedEvent = await Event.findByIdAndUpdate(
-      req.params.id,
-      { $set: req.body },
-      { new: true }
-    );
-    
-    res.json(updatedEvent);
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send('Server Error');
+const EventSchema = new mongoose.Schema({
+  title: {
+    type: String,
+    required: true
+  },
+  description: {
+    type: String,
+    required: true
+  },
+  date: {
+    type: Date,
+    required: true
+  },
+  time: {
+    type: String,
+    required: true
+  },
+  location: {
+    type: String,
+    required: true
+  },
+  organizer: {
+    type: String,
+    required: true
+  },
+  email: {
+    type: String,
+    required: true
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now
   }
 });
 
-// @route   DELETE api/events/:id
+module.exports = mongoose.model('Event', EventSchema);
 // @desc    Delete an event
 // @access  Public
 router.delete('/:id', async (req, res) => {
