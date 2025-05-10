@@ -31,6 +31,7 @@ function App() {
 
   const addEvent = async (eventData) => {
     try {
+      console.log('Sending event data:', eventData);
       const response = await fetch('http://localhost:5000/api/events', {
         method: 'POST',
         headers: {
@@ -38,11 +39,21 @@ function App() {
         },
         body: JSON.stringify(eventData),
       });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('Server returned error:', errorData);
+        alert(`Failed to create event: ${errorData.message || 'Unknown error'}`);
+        return false;
+      }
+      
       const newEvent = await response.json();
+      console.log('Event created successfully:', newEvent);
       setEvents([...events, newEvent]);
       return true;
     } catch (error) {
       console.error('Error adding event:', error);
+      alert(`Failed to create event: ${error.message}`);
       return false;
     }
   };
